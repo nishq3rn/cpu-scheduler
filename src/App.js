@@ -435,37 +435,51 @@ const CPUSchedulerSimulator = () => {
             </div>
 
             <h3 className="gantt-title">Execution Timeline (Gantt Chart)</h3>
-            <div className="gantt-container">
-              {results.gantt.map((g, idx) => {
-                const processIndex = processes.findIndex(p => p.pid === g.pid);
-                const color = colors[processIndex % colors.length] || colors[0];
-                const width = Math.max(60, g.duration * 30); // Dynamic width multiplier
-                
-                return (
-                  <div key={idx} className="gantt-block-wrapper">
-                    <div
-                      className="gantt-block"
-                      style={{
-                        minWidth: `${width}px`,
-                        background: `linear-gradient(135deg, ${color}cc 0%, ${color} 100%)`,
-                        border: `1px solid ${color}`
-                      }}
-                    >
-                      {g.pid}
-                    </div>
-                    <div className="gantt-time">{g.start}</div>
-                  </div>
-                );
-              })}
-              {/* End time marker */}
-              {results.gantt.length > 0 && (
-                <div className="gantt-block-wrapper">
-                  <div style={{ height: '60px', minWidth: '20px' }}></div>
-                  <div className="gantt-time">
-                    {results.gantt[results.gantt.length - 1].start + results.gantt[results.gantt.length - 1].duration}
+            <div className="gantt-container-multi">
+              <div className="gantt-scroll-area">
+                {/* Timeline Header (Axis) */}
+                <div className="gantt-axis" style={{ minWidth: `${(results.gantt.length > 0 ? results.gantt[results.gantt.length - 1].start + results.gantt[results.gantt.length - 1].duration : 0) * 30 + 100}px` }}>
+                  <div className="gantt-row-label axis-label">Time</div>
+                  <div className="gantt-timeline-track axis-track">
+                    {Array.from({ length: (results.gantt.length > 0 ? results.gantt[results.gantt.length - 1].start + results.gantt[results.gantt.length - 1].duration : 0) + 1 }).map((_, i) => (
+                      <div key={i} className="gantt-tick" style={{ left: `${i * 30}px` }}>
+                        <span className="tick-label">{i}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
+
+                {/* Rows for each process */}
+                {processes.map((process, pIdx) => {
+                  const pGantt = results.gantt.filter(g => g.pid === process.pid);
+                  const color = colors[pIdx % colors.length] || colors[0];
+                  
+                  return (
+                    <div key={process.pid} className="gantt-row" style={{ minWidth: `${(results.gantt.length > 0 ? results.gantt[results.gantt.length - 1].start + results.gantt[results.gantt.length - 1].duration : 0) * 30 + 100}px` }}>
+                      <div className="gantt-row-label" style={{ color: color }}>
+                        {process.pid}
+                      </div>
+                      <div className="gantt-timeline-track">
+                        {pGantt.map((g, gIdx) => (
+                          <div
+                            key={gIdx}
+                            className="gantt-block-multi"
+                            style={{
+                              left: `${g.start * 30}px`,
+                              width: `${g.duration * 30}px`,
+                              background: `linear-gradient(135deg, ${color}cc 0%, ${color} 100%)`,
+                              boxShadow: `0 4px 10px ${color}40`,
+                              border: `1px solid ${color}`
+                            }}
+                          >
+                            <span className="block-duration">{g.duration}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <h3 className="chart-title">Process Details Matrix</h3>
