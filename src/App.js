@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Play, Plus, Trash2, Brain, RotateCcw, Moon, Sun } from 'lucide-react';
+import './App.css';
 
 // Process Class
 class Process {
@@ -184,7 +185,15 @@ const CPUSchedulerSimulator = () => {
   const [results, setResults] = useState(null);
   const [quantum, setQuantum] = useState(2);
   const [recommendation, setRecommendation] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true); // default to dark in new design
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.remove('light-mode');
+    } else {
+      document.body.classList.add('light-mode');
+    }
+  }, [isDarkMode]);
 
   const addProcess = () => {
     if (newProcess.pid && newProcess.arrival !== '' && newProcess.burst !== '') {
@@ -223,7 +232,7 @@ const CPUSchedulerSimulator = () => {
       priority: 'Priority Scheduling',
       roundRobin: 'Round Robin'
     };
-    setRecommendation(`ML Recommendation: ${names[rec]}`);
+    setRecommendation(`Intelligence Engine: ${names[rec]}`);
   };
 
   const reset = () => {
@@ -231,106 +240,68 @@ const CPUSchedulerSimulator = () => {
     setRecommendation('');
   };
 
-  const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+  const chartColors = {
+    text: isDarkMode ? '#8b949e' : '#586069',
+    grid: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+    tooltipBg: isDarkMode ? 'rgba(22, 27, 34, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+    tooltipBorder: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+  };
+
+  // Vivid colors for gantt chart segments
+  const colors = ['#f85149', '#58a6ff', '#3fb950', '#a371f7', '#d29922', '#ff7b72', '#2f81f7', '#2ea043'];
 
   return (
-    <div
-      className={`min-h-screen p-8 ${
-        isDarkMode
-          ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800'
-          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Theme Toggle Button */}
-        <div className="flex justify-end mb-4">
+    <div className="app-wrapper">
+      <div className="bg-orb orb-1"></div>
+      <div className="bg-orb orb-2"></div>
+
+      <div className="app-container">
+        <div className="header-row">
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`p-3 rounded-lg transition flex items-center gap-2 ${
-              isDarkMode
-                ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600'
-                : 'bg-white text-gray-700 hover:bg-gray-100 shadow-lg'
-            }`}
+            className="theme-btn"
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            <span className="font-medium">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
           </button>
         </div>
 
-        <h1
-          className={`text-4xl font-bold mb-2 text-center ${
-            isDarkMode
-              ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500'
-              : 'text-indigo-900'
-          }`}
-        >
-          Intelligent CPU Scheduler Simulator
-        </h1>
-        <p
-          className={`text-center mb-8 ${
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          }`}
-        >
-          Simulate, Analyze, and Optimize CPU Scheduling Algorithms
-        </p>
+        <div className="title-container">
+          <h1 className="main-title">CPU Scheduler Simulator</h1>
+          <p className="subtitle">Simulate, Analyze, and Optimize CPU Scheduling Algorithms</p>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Process Input */}
-          <div
-            className={`rounded-lg shadow-2xl p-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}
-          >
-            <h2
-              className={`text-2xl font-semibold mb-4 ${
-                isDarkMode ? 'text-gray-100' : 'text-gray-800'
-              }`}
-            >
-              Process Management
-            </h2>
+        <div className="dashboard-grid">
+          {/* Process Management Panel */}
+          <div className="glass-panel">
+            <h2 className="panel-title">Process Hub</h2>
             
-            <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="input-group">
               <input
                 type="text"
-                placeholder="PID"
-                className={`border-2 rounded px-3 py-2 focus:outline-none ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'
-                }`}
+                placeholder="PID e.g. P1"
+                className="custom-input"
                 value={newProcess.pid}
                 onChange={(e) => setNewProcess({...newProcess, pid: e.target.value})}
               />
               <input
                 type="number"
                 placeholder="Arrival"
-                className={`border-2 rounded px-3 py-2 focus:outline-none ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'
-                }`}
+                className="custom-input"
                 value={newProcess.arrival}
                 onChange={(e) => setNewProcess({...newProcess, arrival: e.target.value})}
               />
               <input
                 type="number"
                 placeholder="Burst"
-                className={`border-2 rounded px-3 py-2 focus:outline-none ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'
-                }`}
+                className="custom-input"
                 value={newProcess.burst}
                 onChange={(e) => setNewProcess({...newProcess, burst: e.target.value})}
               />
               <input
                 type="number"
                 placeholder="Priority"
-                className={`border-2 rounded px-3 py-2 focus:outline-none ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'
-                }`}
+                className="custom-input"
                 value={newProcess.priority}
                 onChange={(e) => setNewProcess({...newProcess, priority: e.target.value})}
               />
@@ -338,115 +309,76 @@ const CPUSchedulerSimulator = () => {
             
             <button
               onClick={addProcess}
-              className={`w-full text-white py-2 rounded-lg transition flex items-center justify-center gap-2 mb-4 shadow-lg ${
-                isDarkMode
-                  ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
-                  : 'bg-indigo-600 hover:bg-indigo-700'
-              }`}
+              className="btn-primary"
             >
-              <Plus size={20} /> Add Process
+              <Plus size={18} /> Add Process
             </button>
 
-            <div
-              className={`max-h-64 overflow-y-auto rounded-lg border ${
-                isDarkMode ? 'border-gray-700' : 'border-gray-200'
-              }`}
-            >
-              <table className="w-full">
-                <thead
-                  className={`sticky top-0 ${
-                    isDarkMode ? 'bg-gray-900' : 'bg-gray-100'
-                  }`}
-                >
+            <div className="table-container">
+              <table className="custom-table">
+                <thead>
                   <tr>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>PID</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Arrival</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Burst</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Priority</th>
-                    <th className="px-4 py-3"></th>
+                    <th>PID</th>
+                    <th>Arrival</th>
+                    <th>Burst</th>
+                    <th>Priority</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {processes.map((p, idx) => (
-                    <tr
-                      key={idx}
-                      className={`border-b ${
-                        isDarkMode ? 'border-gray-700 hover:bg-gray-750' : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.pid}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.arrivalTime}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.burstTime}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.priority}</td>
-                      <td className="px-4 py-3">
+                    <tr key={idx}>
+                      <td style={{ color: 'var(--glow-primary)', fontWeight: '600' }}>{p.pid}</td>
+                      <td>{p.arrivalTime}</td>
+                      <td>{p.burstTime}</td>
+                      <td>{p.priority}</td>
+                      <td>
                         <button
                           onClick={() => removeProcess(p.pid)}
-                          className={`transition ${
-                            isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
-                          }`}
+                          className="delete-btn"
+                          title="Remove Process"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>
                   ))}
+                  {processes.length === 0 && (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', opacity: 0.5, padding: '2rem' }}>
+                        No processes added.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Algorithm Selection */}
-          <div
-            className={`rounded-lg shadow-2xl p-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}
-          >
-            <h2
-              className={`text-2xl font-semibold mb-4 ${
-                isDarkMode ? 'text-gray-100' : 'text-gray-800'
-              }`}
-            >
-              Algorithm Configuration
-            </h2>
+          {/* Algorithm Configuration Panel */}
+          <div className="glass-panel">
+            <h2 className="panel-title">Algorithm Configuration</h2>
             
-            <label
-              className={`block mb-2 font-medium ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Select Algorithm:
-            </label>
-            <select
-              className={`w-full border-2 rounded px-4 py-2 mb-4 focus:outline-none ${
-                isDarkMode
-                  ? 'bg-gray-700 border-gray-600 text-gray-100 focus:border-blue-500'
-                  : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
-              }`}
-              value={selectedAlgorithm}
-              onChange={(e) => setSelectedAlgorithm(e.target.value)}
-            >
-              <option value="fcfs">FCFS (First Come First Serve)</option>
-              <option value="sjf">SJF (Shortest Job First)</option>
-              <option value="priority">Priority Scheduling</option>
-              <option value="roundRobin">Round Robin</option>
-            </select>
+            <div className="form-group">
+              <label className="form-label">Algorithm Strategy:</label>
+              <select
+                className="custom-select"
+                value={selectedAlgorithm}
+                onChange={(e) => setSelectedAlgorithm(e.target.value)}
+              >
+                <option value="fcfs">First Come First Serve (FCFS)</option>
+                <option value="sjf">Shortest Job First (SJF)</option>
+                <option value="priority">Priority Scheduling</option>
+                <option value="roundRobin">Round Robin (RR)</option>
+              </select>
+            </div>
 
             {selectedAlgorithm === 'roundRobin' && (
-              <div className="mb-4">
-                <label
-                  className={`block mb-2 font-medium ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
-                  Time Quantum:
-                </label>
+              <div className="form-group">
+                <label className="form-label">Time Quantum (ms):</label>
                 <input
                   type="number"
-                  className={`w-full border-2 rounded px-4 py-2 focus:outline-none ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-gray-100 focus:border-blue-500'
-                      : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
-                  }`}
+                  className="custom-input"
                   value={quantum}
                   onChange={(e) => setQuantum(parseInt(e.target.value))}
                   min="1"
@@ -456,226 +388,137 @@ const CPUSchedulerSimulator = () => {
 
             <button
               onClick={getRecommendation}
-              className={`w-full text-white py-3 rounded-lg transition flex items-center justify-center gap-2 mb-3 shadow-lg ${
-                isDarkMode
-                  ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800'
-                  : 'bg-purple-600 hover:bg-purple-700'
-              }`}
+              className="btn-secondary"
             >
-              <Brain size={20} /> Algorithm Recommendation
+              <Brain size={18} /> Get AI Recommendation
             </button>
 
             {recommendation && (
-              <div
-                className={`rounded-lg p-3 mb-3 text-center font-medium border-2 ${
-                  isDarkMode
-                    ? 'bg-purple-900 bg-opacity-40 border-purple-500 text-purple-200'
-                    : 'bg-purple-50 border-purple-300 text-purple-800'
-                }`}
-              >
+              <div className="rec-banner">
                 {recommendation}
               </div>
             )}
 
-            <button
-              onClick={simulate}
-              disabled={processes.length === 0}
-              className={`w-full text-white py-3 rounded-lg transition flex items-center justify-center gap-2 mb-2 shadow-lg ${
-                isDarkMode
-                  ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed'
-              }`}
-            >
-              <Play size={20} /> Run Simulation
-            </button>
+            <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
+              <button
+                onClick={simulate}
+                disabled={processes.length === 0}
+                className="btn-success"
+              >
+                <Play size={18} /> Execute Simulation
+              </button>
 
-            <button
-              onClick={reset}
-              className={`w-full text-white py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-lg ${
-                isDarkMode
-                  ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800'
-                  : 'bg-gray-600 hover:bg-gray-700'
-              }`}
-            >
-              <RotateCcw size={20} /> Reset Results
-            </button>
+              <button
+                onClick={reset}
+                className="btn-danger"
+              >
+                <RotateCcw size={18} /> Reset Results
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Results */}
+        {/* Dynamic Results Area */}
         {results && (
-          <div
-            className={`rounded-lg shadow-2xl p-6 mb-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}
-          >
-            <h2
-              className={`text-2xl font-semibold mb-4 ${
-                isDarkMode ? 'text-gray-100' : 'text-gray-800'
-              }`}
-            >
-              Process Details
-            </h2>
+          <div className="glass-panel results-panel">
+            <h2 className="panel-title mb-4">Simulation Insights</h2>
             
-            {/* Process Details Table */}
-            <div
-              className={`overflow-x-auto rounded-lg mb-6 border ${
-                isDarkMode ? 'border-gray-700' : 'border-gray-200'
-              }`}
-            >
-              <table className="w-full">
-                <thead className={isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-value">{results.avgWaiting.toFixed(2)}</div>
+                <div className="stat-label">Avg. Waiting Time</div>
+              </div>
+              <div className="stat-card success">
+                <div className="stat-value">{results.avgTurnaround.toFixed(2)}</div>
+                <div className="stat-label">Avg. Turnaround Time</div>
+              </div>
+            </div>
+
+            <h3 className="gantt-title">Execution Timeline (Gantt Chart)</h3>
+            <div className="gantt-container">
+              {results.gantt.map((g, idx) => {
+                const processIndex = processes.findIndex(p => p.pid === g.pid);
+                const color = colors[processIndex % colors.length] || colors[0];
+                const width = Math.max(60, g.duration * 30); // Dynamic width multiplier
+                
+                return (
+                  <div key={idx} className="gantt-block-wrapper">
+                    <div
+                      className="gantt-block"
+                      style={{
+                        minWidth: `${width}px`,
+                        background: `linear-gradient(135deg, ${color}cc 0%, ${color} 100%)`,
+                        border: `1px solid ${color}`
+                      }}
+                    >
+                      {g.pid}
+                    </div>
+                    <div className="gantt-time">{g.start}</div>
+                  </div>
+                );
+              })}
+              {/* End time marker */}
+              {results.gantt.length > 0 && (
+                <div className="gantt-block-wrapper">
+                  <div style={{ height: '60px', minWidth: '20px' }}></div>
+                  <div className="gantt-time">
+                    {results.gantt[results.gantt.length - 1].start + results.gantt[results.gantt.length - 1].duration}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <h3 className="chart-title">Process Details Matrix</h3>
+            <div className="table-container" style={{ marginBottom: '2rem' }}>
+              <table className="custom-table">
+                <thead>
                   <tr>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>PID</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Arrival</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Burst</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Completion</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Waiting</th>
-                    <th className={`px-4 py-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Turnaround</th>
+                    <th>PID</th>
+                    <th>Arrival</th>
+                    <th>Burst</th>
+                    <th>Completion</th>
+                    <th>Waiting</th>
+                    <th>Turnaround</th>
                   </tr>
                 </thead>
                 <tbody>
                   {results.processes.map((p, idx) => (
-                    <tr
-                      key={idx}
-                      className={`border-b ${
-                        isDarkMode ? 'border-gray-700 hover:bg-gray-750' : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <td className={isDarkMode ? 'px-4 py-3 font-semibold text-blue-400' : 'px-4 py-3 font-semibold text-indigo-700'}>{p.pid}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.arrivalTime}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.burstTime}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.completionTime}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.waitingTime}</td>
-                      <td className={isDarkMode ? 'px-4 py-3 text-gray-200' : 'px-4 py-3 text-gray-900'}>{p.turnaroundTime}</td>
+                    <tr key={idx}>
+                      <td style={{ color: 'var(--glow-primary)', fontWeight: '600' }}>{p.pid}</td>
+                      <td>{p.arrivalTime}</td>
+                      <td>{p.burstTime}</td>
+                      <td style={{ color: 'var(--glow-success)' }}>{p.completionTime}</td>
+                      <td style={{ color: 'var(--glow-secondary)' }}>{p.waitingTime}</td>
+                      <td style={{ color: 'var(--glow-primary)' }}>{p.turnaroundTime}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            {/* Gantt Chart */}
-            <h3
-              className={`text-xl font-semibold mb-3 ${
-                isDarkMode ? 'text-gray-100' : 'text-gray-800'
-              }`}
-            >
-              Gantt Chart
-            </h3>
-            <div
-              className={`rounded-lg p-4 mb-6 overflow-x-auto border ${
-                isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-100 border-gray-200'
-              }`}
-            >
-              <div className="flex min-w-max">
-                {results.gantt.map((g, idx) => (
-                  <div key={idx} className="flex flex-col items-center">
-                    <div
-                      className={`h-16 flex items-center justify-center text-white font-semibold border-2 ${
-                        isDarkMode ? 'border-gray-600' : 'border-white'
-                      }`}
-                      style={{
-                        width: '80px',
-                        backgroundColor: colors[processes.findIndex(p => p.pid === g.pid) % colors.length]
-                      }}
-                    >
-                      {g.pid}
-                    </div>
-                    <div className={isDarkMode ? 'text-xs mt-1 text-gray-400' : 'text-xs mt-1 text-gray-700'}>{g.start}</div>
-                  </div>
-                ))}
-                <div className="flex flex-col items-center">
-                  <div className="h-16"></div>
-                  <div className={isDarkMode ? 'text-xs mt-1 text-gray-400' : 'text-xs mt-1 text-gray-700'}>
-                    {results.gantt[results.gantt.length - 1].start + results.gantt[results.gantt.length - 1].duration}
-                  </div>
-                </div>
-              </div>
+            <h3 className="chart-title">Analytic Comparison Chart</h3>
+            <div className="chart-wrapper">
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={results.processes} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+                  <XAxis dataKey="pid" stroke={chartColors.text} tick={{ fill: chartColors.text }} />
+                  <YAxis stroke={chartColors.text} tick={{ fill: chartColors.text }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: chartColors.tooltipBg,
+                      border: `1px solid ${chartColors.tooltipBorder}`,
+                      borderRadius: '12px',
+                      color: isDarkMode ? '#c9d1d9' : '#24292e',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.2)'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: '20px', color: chartColors.text }} />
+                  <Bar dataKey="waitingTime" fill="var(--glow-primary)" name="Waiting Time" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="turnaroundTime" fill="var(--glow-success)" name="Turnaround Time" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
-            {/* Simulation Results Metrics */}
-            <h3
-              className={`text-xl font-semibold mb-3 ${
-                isDarkMode ? 'text-gray-100' : 'text-gray-800'
-              }`}
-            >
-              Simulation Results
-            </h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div
-                className={`rounded-lg p-4 text-center shadow-lg border ${
-                  isDarkMode
-                    ? 'bg-gradient-to-br from-blue-900 to-blue-800 border-blue-700'
-                    : 'bg-blue-50 border-blue-200'
-                }`}
-              >
-                <div
-                  className={`text-3xl font-bold ${
-                    isDarkMode ? 'text-blue-200' : 'text-blue-600'
-                  }`}
-                >
-                  {results.avgWaiting.toFixed(2)}
-                </div>
-                <div className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                  Average Waiting Time
-                </div>
-              </div>
-              <div
-                className={`rounded-lg p-4 text-center shadow-lg border ${
-                  isDarkMode
-                    ? 'bg-gradient-to-br from-green-900 to-green-800 border-green-700'
-                    : 'bg-green-50 border-green-200'
-                }`}
-              >
-                <div
-                  className={`text-3xl font-bold ${
-                    isDarkMode ? 'text-green-200' : 'text-green-600'
-                  }`}
-                >
-                  {results.avgTurnaround.toFixed(2)}
-                </div>
-                <div className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                  Average Turnaround Time
-                </div>
-              </div>
-            </div>
-
-            {/* Performance Chart */}
-            <h3
-              className={`text-xl font-semibold mb-3 mt-6 ${
-                isDarkMode ? 'text-gray-100' : 'text-gray-800'
-              }`}
-            >
-              Performance Comparison
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={results.processes}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke={isDarkMode ? '#374151' : '#e5e7eb'}
-                />
-                <XAxis
-                  dataKey="pid"
-                  stroke={isDarkMode ? '#9ca3af' : '#4b5563'}
-                />
-                <YAxis stroke={isDarkMode ? '#9ca3af' : '#4b5563'} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                    border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                    borderRadius: '0.5rem',
-                    color: isDarkMode ? '#e5e7eb' : '#1f2937'
-                  }}
-                />
-                <Legend
-                  wrapperStyle={{
-                    color: isDarkMode ? '#9ca3af' : '#4b5563'
-                  }}
-                />
-                <Bar dataKey="waitingTime" fill="#3b82f6" name="Waiting Time" />
-                <Bar dataKey="turnaroundTime" fill="#10b981" name="Turnaround Time" />
-              </BarChart>
-            </ResponsiveContainer>
           </div>
         )}
       </div>
