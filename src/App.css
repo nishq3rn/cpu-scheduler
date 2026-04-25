@@ -208,6 +208,17 @@ body {
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
 }
 
+.custom-select option {
+  background: var(--bg-gradient);
+  background-color: #161b22;
+  color: var(--text-primary);
+}
+
+.light-mode .custom-select option {
+  background-color: #ffffff;
+  color: var(--light-text-primary);
+}
+
 .btn-primary {
   width: 100%;
   display: flex;
