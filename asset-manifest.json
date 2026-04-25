@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/cpu-scheduler/static/css/main.f7e607d0.css",
+    "main.js": "/cpu-scheduler/static/js/main.67542909.js",
+    "static/js/453.0e08a595.chunk.js": "/cpu-scheduler/static/js/453.0e08a595.chunk.js",
+    "index.html": "/cpu-scheduler/index.html",
+    "main.f7e607d0.css.map": "/cpu-scheduler/static/css/main.f7e607d0.css.map",
+    "main.67542909.js.map": "/cpu-scheduler/static/js/main.67542909.js.map",
+    "453.0e08a595.chunk.js.map": "/cpu-scheduler/static/js/453.0e08a595.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f7e607d0.css",
+    "static/js/main.67542909.js"
+  ]
+}
