@@ -45,17 +45,17 @@ const schedulingAlgorithms = {
     const completed = [];
     let currentTime = 0;
     const gantt = [];
-    const remaining = [...processes];
+    const remaining = [...processes].sort((a, b) => a.arrivalTime - b.arrivalTime);
     
     while (completed.length < processes.length) {
-      const arrived = remaining.filter(p => p.arrivalTime <= currentTime);
-      arrived.forEach(p => {
-        if (!ready.includes(p)) ready.push(p);
-      });
-      remaining.splice(0, remaining.length, ...remaining.filter(p => p.arrivalTime > currentTime));
+      while (remaining.length > 0 && remaining[0].arrivalTime <= currentTime) {
+        ready.push(remaining.shift());
+      }
       
       if (ready.length === 0) {
-        currentTime++;
+        if (remaining.length > 0) {
+          currentTime = remaining[0].arrivalTime;
+        }
         continue;
       }
       
@@ -81,17 +81,17 @@ const schedulingAlgorithms = {
     const completed = [];
     let currentTime = 0;
     const gantt = [];
-    const remaining = [...processes];
+    const remaining = [...processes].sort((a, b) => a.arrivalTime - b.arrivalTime);
     
     while (completed.length < processes.length) {
-      const arrived = remaining.filter(p => p.arrivalTime <= currentTime);
-      arrived.forEach(p => {
-        if (!ready.includes(p)) ready.push(p);
-      });
-      remaining.splice(0, remaining.length, ...remaining.filter(p => p.arrivalTime > currentTime));
+      while (remaining.length > 0 && remaining[0].arrivalTime <= currentTime) {
+        ready.push(remaining.shift());
+      }
       
       if (ready.length === 0) {
-        currentTime++;
+        if (remaining.length > 0) {
+          currentTime = remaining[0].arrivalTime;
+        }
         continue;
       }
       
@@ -120,13 +120,15 @@ const schedulingAlgorithms = {
     const remaining = processes.map(p => ({ ...p, remainingTime: p.burstTime, firstRun: true }));
     
     remaining.sort((a, b) => a.arrivalTime - b.arrivalTime);
-    ready.push(remaining.shift());
     
     while (completed.length < processes.length) {
+      while (remaining.length > 0 && remaining[0].arrivalTime <= currentTime) {
+        ready.push(remaining.shift());
+      }
+      
       if (ready.length === 0) {
         if (remaining.length > 0) {
-          ready.push(remaining.shift());
-          currentTime = ready[0].arrivalTime;
+          currentTime = remaining[0].arrivalTime;
         }
         continue;
       }
@@ -144,9 +146,9 @@ const schedulingAlgorithms = {
       currentTime += execTime;
       p.remainingTime -= execTime;
       
-      const newArrivals = remaining.filter(r => r.arrivalTime <= currentTime);
-      newArrivals.forEach(r => ready.push(r));
-      remaining.splice(0, remaining.length, ...remaining.filter(r => r.arrivalTime > currentTime));
+      while (remaining.length > 0 && remaining[0].arrivalTime <= currentTime) {
+        ready.push(remaining.shift());
+      }
       
       if (p.remainingTime > 0) {
         ready.push(p);
@@ -164,6 +166,7 @@ const schedulingAlgorithms = {
 
 // ML Recommendation
 const recommendAlgorithm = (processes) => {
+  if (!processes || processes.length === 0) return 'fcfs';
   const avgBurst = processes.reduce((sum, p) => sum + p.burstTime, 0) / processes.length;
   const burstVariance = processes.reduce((sum, p) => sum + Math.pow(p.burstTime - avgBurst, 2), 0) / processes.length;
   const hasPriority = processes.some(p => p.priority !== 0);
